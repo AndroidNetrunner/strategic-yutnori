@@ -19,7 +19,7 @@ const Main = styled.main`
 `
 
 const Title = styled.h1`
-  margin: 0;
+  margin-top: 10rem;
   line-height: 1.15;
   font-size: 4rem;
   text-align: center;
