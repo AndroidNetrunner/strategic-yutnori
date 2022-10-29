@@ -13,10 +13,11 @@ import { useEffect, useState } from "react";
 import db from "../../firebase.config.js";
 import Button from "../../components/Button";
 import { Container } from "../../components/sharedstyles";
-import styled from "styled-components";
+
 import ChooseYuts from "../../components/ChooseYuts";
 import ThrownYuts from "../../components/ThrownYuts";
 import MovingPieces from "../../components/MovingPieces";
+import Map from "../../components/Map";
 
 async function startGame(docRef) {
   await updateDoc(docRef, {
@@ -178,133 +179,3 @@ export default function Room() {
   );
 }
 
-function Map() {
-  return (
-    <StyledTable>
-      <tr>
-        <td>
-          <BigCircle />
-        </td>
-        <td colSpan={5}>
-          <HorizontalCircle />
-          <HorizontalCircle />
-          <HorizontalCircle />
-          <HorizontalCircle />
-        </td>
-        <td>
-          <BigCircle />
-        </td>
-      </tr>
-      <tr>
-        <td rowSpan={5}>
-          <VerticalCircle />
-          <VerticalCircle />
-          <VerticalCircle />
-          <VerticalCircle />
-        </td>
-        <td>
-          <SmallCircle />
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-        <td rowSpan={5}>
-          <VerticalCircle />
-          <VerticalCircle />
-          <VerticalCircle />
-          <VerticalCircle />
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td>
-          <BigCircle />
-        </td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <SmallCircle />
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>
-          <SmallCircle />
-        </td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>
-          <BigCircle />
-        </td>
-        <td colSpan={5}>
-          <HorizontalCircle />
-          <HorizontalCircle />
-          <HorizontalCircle />
-          <HorizontalCircle />
-        </td>
-        <td>
-          <BigCircle />
-        </td>
-      </tr>
-    </StyledTable>
-  );
-}
-
-const StyledTable = styled.table`
-  border-collapse: separate;
-  empty-cells: show;
-`;
-
-const BigCircle = styled.div`
-  width: 4.5rem;
-  height: 4.5rem;
-  border: 1px solid;
-  border-radius: 100%;
-  margin: 0 0.5rem 0 0.5rem;
-`;
-
-const SmallCircle = styled.div`
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 1px solid;
-  border-radius: 100%;
-  margin: 2rem;
-  display: inline-block;
-`;
-
-const HorizontalCircle = styled(SmallCircle)`
-  margin-left: 3.2rem;
-  margin-right: 3.2rem;
-`;
-const VerticalCircle = styled(SmallCircle)`
-  margin-top: 5rem;
-  margin-bottom: 5rem;
-  display: block;
-`;
