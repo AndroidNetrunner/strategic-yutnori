@@ -13,11 +13,12 @@ import { useEffect, useState } from "react";
 import db from "../../firebase.config.js";
 import Button from "../../components/Button";
 import { Container } from "../../components/sharedstyles";
-
+import { useSelector } from "react-redux";
 import ChooseYuts from "../../components/ChooseYuts";
 import ThrownYuts from "../../components/ThrownYuts";
 import MovingPieces from "../../components/MovingPieces";
 import Map from "../../components/Map";
+import { RootState } from "../../store/index";
 
 async function startGame(docRef) {
   await updateDoc(docRef, {
@@ -84,10 +85,7 @@ function Turn({ turn }) {
 }
 
 function Game({ docRef, color, unSub }) {
-  const [turn, setTurn] = useState({
-    color: "blue",
-    partner: false,
-  });
+  const [turn, setTurn] = useSelector((state: RootState) => state.turn);
   const [remainedPieces, setRemainedPieces] = useState({
     bluePlayer: 2,
     bluePartner: 2,
@@ -178,4 +176,3 @@ export default function Room() {
     />
   );
 }
-
