@@ -11,7 +11,14 @@ import Content from "../components/Content";
 import Button from "../components/Button";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { collection, doc, getDoc, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import db from "../firebase.config";
 
@@ -29,7 +36,7 @@ export default function Home() {
       result += alphabets[Math.floor(Math.random() * 26)];
     }
     return result;
-  };  
+  };
   const handleCreate = async () => {
     const invitationCode = generateInvitationCode();
     await setDoc(doc(db, "rooms", invitationCode), {
@@ -37,22 +44,23 @@ export default function Home() {
       admin: nickname,
       guest: null,
       ready: null,
-      gameStarted: false
+      gameStarted: false,
     });
-      router.push({
-        pathname:"/room/[invitationCode]",
-        query: {invitationCode, nickname, isAdmin: true}
+    router.push(
+      {
+        pathname: "/room/[invitationCode]",
+        query: { invitationCode, nickname, isAdmin: true },
       },
-      invitationCode)
+      invitationCode
+    );
   };
   const handleEntry = async () => {
-    const docRef = doc(roomsRef, invitationCode)
+    const docRef = doc(roomsRef, invitationCode);
     const roomSnap = await getDoc(docRef);
-    if (!roomSnap.exists())
-      alert("해당하는 방이 존재하지 않습니다.");
+    if (!roomSnap.exists()) alert("해당하는 방이 존재하지 않습니다.");
     else {
       await updateDoc(docRef, {
-        guest: nickname
+        guest: nickname,
       });
       router.push(
         {
@@ -62,7 +70,7 @@ export default function Home() {
         invitationCode
       );
     }
-  }
+  };
   return (
     <Container>
       <Head>
@@ -108,7 +116,7 @@ export default function Home() {
                 <Button
                   type="submit"
                   className="btn btn-primary"
-                  ableCondition={nickname}
+                  ableCondition={nickname && !invitationCode}
                   text="방 생성"
                   onClick={handleCreate}
                 />
