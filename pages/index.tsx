@@ -46,7 +46,6 @@ export default function Home() {
       ready: null,
       gameStarted: false,
     });
-
     router.push(
       {
         pathname: "/room/[invitationCode]",
@@ -117,7 +116,7 @@ export default function Home() {
                 <Button
                   type="submit"
                   className="btn btn-primary"
-                  ableCondition={nickname}
+                  ableCondition={nickname && !invitationCode}
                   text="방 생성"
                   onClick={handleCreate}
                 />
