@@ -35,6 +35,15 @@ export const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
+    updateGame: (state, { payload }) => {
+      const { chosenYut, turn, playingPieces, finishedPieces, remainedPieces, possibleMoves } = payload;
+      state.chosenYut = chosenYut;
+      state.turn = turn;
+      state.playingPieces = playingPieces;
+      state.finishedPieces = finishedPieces;
+      state.remainedPieces = remainedPieces;
+      state.possibleMoves = possibleMoves;
+    },
     chooseYut: (state, { payload }) => {
       state.chosenYut[payload.color] = payload.yut;
     },

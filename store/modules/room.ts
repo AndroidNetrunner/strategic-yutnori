@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "..";
 
 const initialState = {
   admin: null,
@@ -12,6 +13,13 @@ const roomSlice = createSlice({
   name: "room",
   initialState,
   reducers: {
+    updateRoom: (state, { payload }) => {
+      state.admin = payload.admin;
+      state.guest = payload.guest;
+      state.gameStarted = payload.gameStarted;
+      state.ready = payload.ready;
+      state.invitationCode = payload.invitationCode;
+    },
     setAdmin: (state, payload) => {
       state.admin = payload.payload;
     },
