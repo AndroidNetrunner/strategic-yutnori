@@ -1,9 +1,10 @@
-import type { AppProps } from "next/app";
+import { AppProps } from "next/app";
+import React, { FC } from "react";
 import { ThemeProvider, DefaultTheme } from "styled-components";
 import GlobalStyle from "../components/globalstyles";
 import "bootstrap/dist/css/bootstrap.css";
+import { wrapper } from "../store/index";
 import { Provider } from "react-redux";
-import { wrapper } from "../store/index.js";
 
 const theme: DefaultTheme = {
   colors: {
@@ -12,15 +13,16 @@ const theme: DefaultTheme = {
   },
 };
 
-function App({ Component, pageProps }: AppProps) {
+const App: FC<AppProps> = ({ Component, ...rest }) => {
+  const { store, props } = wrapper.useWrappedStore(rest);
   return (
-    <>
+    <Provider store={store}>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
-        <Component {...pageProps} />
+        <Component {...props.pageProps} />
       </ThemeProvider>
-    </>
+    </Provider>
   );
-}
+};
 
-export default wrapper.withRedux(App);
+export default App;
