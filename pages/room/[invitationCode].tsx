@@ -1,19 +1,10 @@
 import { useRouter } from "next/router";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getFirestore,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import db from "../../firebase.config.js";
 import Button from "../../components/Button";
 import { Container } from "../../components/sharedstyles";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ChooseYuts from "../../components/ChooseYuts";
 import ThrownYuts from "../../components/ThrownYuts";
 import MovingPieces from "../../components/MovingPieces";
@@ -53,6 +44,7 @@ async function startGame(docRef) {
 }
 
 function Preparation({ isAdmin, admin, guest, ready, invitationCode, docRef }) {
+  console.log("admin", admin);
   return (
     <div>
       초대 코드: {invitationCode}, 방장: {admin}, 게스트: {guest}, 준비:{" "}
@@ -85,39 +77,35 @@ function Turn({ turn }) {
 }
 
 function Game({ docRef, color, unSub }) {
-  const [turn, setTurn] = useSelector((state: RootState) => state.turn);
-  const [remainedPieces, setRemainedPieces] = useState({
-    bluePlayer: 2,
-    bluePartner: 2,
-    redPlayer: 2,
-    redPartner: 2,
-  });
-  const [finishedPieces, setFinishedPieces] = useState({
-    bluePlayer: 0,
-    bluePartner: 0,
-    redPlayer: 0,
-    redPartner: 0,
-  });
-  const [playingPieces, setPlayingPieces] = useState({
-    bluePlayer: [],
-    bluePartner: [],
-    redPlayer: [],
-    redPartner: [],
-  });
-  const [myYut, setMyYut] = useState(null);
-  const [opponentYut, setOpponentYut] = useState(null);
-
+  const { turn, remainedPieces, finishedPieces, playingPieces, chosenYut } =
+    useSelector((state: RootState) => state.game);
+  const myYut = color === "blue" ? chosenYut.blue : chosenYut.red;
+  const opponentYut = color === "blue" ? chosenYut.red : chosenYut.blue;
+  console.log("myYut: ", myYut);
+  console.log("opponentYut: ", opponentYut);
+  const dispatch = useDispatch();
   useEffect(() => {
     unSub();
     onSnapshot(docRef, (doc) => {
-      const { turn, remainedPieces, finishedPieces, playingPieces, chosenYut } =
-        doc.data();
-      setTurn(turn);
-      setRemainedPieces(remainedPieces);
-      setFinishedPieces(finishedPieces);
-      setPlayingPieces(playingPieces);
-      setMyYut(chosenYut[color === "red" ? "red" : "blue"]);
-      setOpponentYut(chosenYut[color === "red" ? "blue" : "red"]);
+      const {
+        turn,
+        remainedPieces,
+        finishedPieces,
+        playingPieces,
+        chosenYut,
+        possibleMoves,
+      } = doc.data();
+      dispatch({
+        type: "game/updateGame",
+        payload: {
+          turn,
+          remainedPieces,
+          finishedPieces,
+          playingPieces,
+          chosenYut,
+          possibleMoves,
+        },
+      });
     });
   }, []);
 
@@ -150,18 +138,24 @@ const readyGame = async (docRef, ready) => {
 export default function Room() {
   const router = useRouter();
   const { invitationCode, nickname, isAdmin } = router.query;
-  const [admin, setAdmin] = useState(nickname);
-  const [guest, setGuest] = useState(null);
-  const [ready, setReady] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
+  const dispatch = useDispatch();
+  const { admin, guest, ready, gameStarted } = useSelector(
+    (state: RootState) => state.room
+  );
   if (typeof invitationCode !== "string") return;
   const docRef = doc(db, "rooms", invitationCode);
   const unSub = onSnapshot(docRef, (doc) => {
     const { admin, guest, ready, gameStarted } = doc.data();
-    setAdmin(admin);
-    setGuest(guest);
-    setReady(ready);
-    setGameStarted(gameStarted);
+    dispatch({
+      type: "room/updateRoom",
+      payload: {
+        admin,
+        guest,
+        gameStarted,
+        ready,
+        invitationCode,
+      },
+    });
   });
   return gameStarted ? (
     <Game docRef={docRef} color={isAdmin ? "blue" : "red"} unSub={unSub} />
