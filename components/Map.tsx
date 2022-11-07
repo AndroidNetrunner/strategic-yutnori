@@ -5,7 +5,7 @@ export default function Map() {
       <StyledTable>
         <tr>
           <td>
-            <BigCircle />
+            <BigCircle color="blue" />
           </td>
           <td colSpan={5}>
             <HorizontalCircle />
