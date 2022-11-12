@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import db from "../../firebase.config.js";
 import Button from "../../components/Button";
@@ -10,6 +10,14 @@ import ThrownYuts from "../../components/ThrownYuts";
 import MovingPieces from "../../components/MovingPieces";
 import Map from "../../components/Map";
 import { RootState } from "../../store/index";
+
+function isMovingPhase(thrownYuts) {
+  console.log("inMovingPhase:", thrownYuts);
+  console.log("test: ", thrownYuts[thrownYuts.length - 1]);
+  if (!thrownYuts.length) return false;
+  if ([0, 4].includes(thrownYuts[thrownYuts.length - 1])) return false;
+  return true;
+}
 
 async function startGame(docRef) {
   await updateDoc(docRef, {
@@ -40,6 +48,7 @@ async function startGame(docRef) {
       blue: null,
     },
     gameStarted: true,
+    thrownYuts: [],
   });
 }
 
@@ -77,8 +86,16 @@ function Turn({ turn }) {
 }
 
 function Game({ docRef, color, unSub }) {
-  const { turn, remainedPieces, finishedPieces, playingPieces, chosenYut } =
-    useSelector((state: RootState) => state.game);
+  const {
+    turn,
+    remainedPieces,
+    finishedPieces,
+    playingPieces,
+    chosenYut,
+    thrownYuts,
+    isThrowing,
+  } = useSelector((state: RootState) => state.game);
+  console.log("thrownYuts", thrownYuts);
   const myYut = color === "blue" ? chosenYut.blue : chosenYut.red;
   const opponentYut = color === "blue" ? chosenYut.red : chosenYut.blue;
   console.log("myYut: ", myYut);
@@ -86,7 +103,7 @@ function Game({ docRef, color, unSub }) {
   const dispatch = useDispatch();
   useEffect(() => {
     unSub();
-    onSnapshot(docRef, (doc) => {
+    onSnapshot(docRef, async (doc) => {
       const {
         turn,
         remainedPieces,
@@ -94,6 +111,7 @@ function Game({ docRef, color, unSub }) {
         playingPieces,
         chosenYut,
         possibleMoves,
+        thrownYuts,
       } = doc.data();
       dispatch({
         type: "game/updateGame",
@@ -104,19 +122,33 @@ function Game({ docRef, color, unSub }) {
           playingPieces,
           chosenYut,
           possibleMoves,
+          thrownYuts,
+          myColor: color,
         },
       });
+      if (chosenYut && chosenYut.red !== null && chosenYut.blue !== null) {
+        const result = [...thrownYuts, chosenYut.red + chosenYut.blue];
+        await updateDoc(docRef, {
+          chosenYut: {
+            red: null,
+            blue: null,
+          },
+          thrownYuts: result,
+        });
+      }
     });
   }, []);
-
   // TODO:말을 움직일 수 있게 하기
+  console.log("thrownYuts: ", thrownYuts);
   return (
     <Container>
       <Turn turn={turn} />{" "}
-      {myYut === null && <ChooseYuts docRef={docRef} color={color} />}{" "}
-      {myYut !== null && opponentYut !== null && (
+      {!isMovingPhase(thrownYuts) && (
+        <ChooseYuts docRef={docRef} color={color} myYut={myYut} />
+      )}{" "}
+      {thrownYuts !== null && <ThrownYuts thrownYuts={thrownYuts} />}
+      {isMovingPhase(thrownYuts) && (
         <>
-          <ThrownYuts myYut={myYut} opponentYut={opponentYut} />
           <MovingPieces
             myTurn={turn.color === color}
             color={color}

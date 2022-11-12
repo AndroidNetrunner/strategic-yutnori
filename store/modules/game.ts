@@ -29,6 +29,7 @@ const initialState = {
     color: "blue",
     parner: false,
   },
+  thrownYuts: [],
 };
 
 export const gameSlice = createSlice({
@@ -36,13 +37,22 @@ export const gameSlice = createSlice({
   initialState,
   reducers: {
     updateGame: (state, { payload }) => {
-      const { chosenYut, turn, playingPieces, finishedPieces, remainedPieces, possibleMoves } = payload;
+      const {
+        chosenYut,
+        turn,
+        playingPieces,
+        finishedPieces,
+        remainedPieces,
+        possibleMoves,
+        thrownYuts,
+      } = payload;
       state.chosenYut = chosenYut;
       state.turn = turn;
       state.playingPieces = playingPieces;
       state.finishedPieces = finishedPieces;
       state.remainedPieces = remainedPieces;
       state.possibleMoves = possibleMoves;
+      state.thrownYuts = thrownYuts;
     },
     chooseYut: (state, { payload }) => {
       state.chosenYut[payload.color] = payload.yut;
